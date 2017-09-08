@@ -1,4 +1,3 @@
-console.log("Its already time to premove!!");
 var lichessGreen = '#759900';
 var lichessRed = '#a00000';
 
@@ -72,7 +71,8 @@ function getTime(clock) {
 }
 
 function drawPie(time, loader) {
-    time = 360 - time * 360 / gameTime;
+    time = 360 - time * 360 / gameTime || .1;
+
     var r = ( time * p / 180 )
         , x = Math.sin( r ) * 125
         , y = Math.cos( r ) * - 125
