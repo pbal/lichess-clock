@@ -72,14 +72,13 @@ function getTime(clock) {
 }
 
 function drawPie(time, loader) {
-    time = time * 360 / gameTime;
-    console.log(time)
+    time = 360 - time * 360 / gameTime;
     var r = ( time * p / 180 )
         , x = Math.sin( r ) * 125
         , y = Math.cos( r ) * - 125
-        , mid = ( time > 180 ) ? 1 : 0
-        , anim = 'M 0 0 v -125 A 125 125 0 '
-            + mid + ' 1 '
+        , mid = ( time > 180 ) ? 0 : 1
+        , anim = 'M 0 0 v -125 A 125 125 1 '
+            + mid + ' 0 '
             +  x  + ' '
             +  y  + ' z';
 
