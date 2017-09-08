@@ -50,12 +50,12 @@
         <div id="whiteTimer" class="clock clock_bottom">
             <span>White</span>
             <span class="time">
-                1:01</span>
+                3:00</span>
         </div>
         <div id="blackTimer" class="clock clock_top">
             <span>Black</span>
             <span class="time">
-                    1:01</span>
+                    3:00</span>
         </div>
     </div>
     <script type="text/javascript">
@@ -108,8 +108,8 @@
             $('#toggleTime').attr('disabled', true);
         })
         $('#resetGame').click(() => {
-            $(whiteClock).html("01:01");
-            $(blackClock).html("01:01");
+            $(whiteClock).html("3:00");
+            $(blackClock).html("03:00");
         });
         $('#toggleTime').click(() => {
             doBlackTime = !doBlackTime;
