@@ -1,3 +1,4 @@
+console.log('lichess clock dials')
 var lichessGreen = '#759900';
 var lichessRed = '#a00000';
 
@@ -46,10 +47,25 @@ var myClock = $(".clock.clock_bottom"),
     a = 0,
     p = Math.PI;
 
+// read game time from lichess data obj
+var scr = $("script")[2].textContent;
+scr = scr.substr(scr.indexOf('data: ') + 6);
+scr = scr.substr(0, scr.indexOf('i18n:'));
+scr = scr.substr(0, scr.lastIndexOf(',')).trim();
+try {
+    var data = $.parseJSON(scr);
+} catch(e) {
+    console.log('clocks only when you are playing')
+}
+
 if ($('body').hasClass('playing')) {
-    var myGameTime = getTime(myClock);
-    var hisGameTime = getTime(hisClock);
-    gameTime = myGameTime || hisGameTime;
+    if (!data.clock.initial) {
+        var myGameTime = getTime(myClock);
+        var hisGameTime = getTime(hisClock);
+        gameTime = myGameTime || hisGameTime;
+    } else {
+        gameTime = data.clock.initial;
+    }
     timeout();
 }
 function timeout() {
