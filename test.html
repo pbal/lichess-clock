@@ -1,0 +1,126 @@
+<html>
+
+<head>
+    <script type="text/javascript" src="./jquery.js"></script>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 14px;
+        }
+        .buttons {
+            text-align: center;
+            margin: 50px auto;
+        }
+        .buttons button {
+            margin: 0 10px;
+            padding: 10px 20px;
+        }
+        .timers {
+            text-align: center;
+            margin: 100px auto;
+        }
+        .timers .clock {
+            display: inline-block;
+            margin: 0 30px;
+        }
+        .timers .clock span {
+            display: block;
+            margin: 20px 30px;
+            font-size: 30px;
+        }
+        .timers .clock span + span {
+            font-size: 80px;
+            width: 200px;
+        }
+    </style>
+
+</head>
+
+<body class="playing">
+    <h1>
+        Clock tester
+    </h1>
+    <div class="buttons">
+
+    <button id="startGame">Start</button>
+    <button id="stopGame">Stop</button>
+    <button id="toggleTime" disabled="true">Toggle</button>
+    <button id="resetGame">Reset</button>
+
+    </div>
+    <div class="timers">
+        <div id="whiteTimer" class="clock clock_bottom">
+            <span>White</span>
+            <span class="time">
+                1:01</span>
+        </div>
+
+        <div id="blackTimer" class="clock clock_top">
+            <span>Black</span>
+            <span class="time">
+                    1:01</span>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        var doTime = false;
+        var doWhiteTime = true;
+        var doBlackTime = false;
+        var whiteClock = $('#whiteTimer .time');
+        var blackClock = $('#blackTimer .time');
+        function startTimer() {
+
+            if (!doTime) return;
+
+            var whiteTime = $(whiteClock).text();
+            var blackTime = $(blackClock).text();
+
+            if (doWhiteTime) {
+                whiteTime = getTextTime(whiteTime);
+            }
+            if (doBlackTime) {
+                blackTime = getTextTime(blackTime);
+            }
+            doTime = doTime && parseInt(whiteTime.replace(':', ''));
+            doTime = doTime && parseInt(blackTime.replace(':', ''));
+
+            if (doWhiteTime) $(whiteClock).html(whiteTime);
+            if (doBlackTime) $(blackClock).html(blackTime);
+
+            setTimeout(startTimer, 100);
+        }
+        function getTextTime(time) {
+            var timeArray = time.split(/[:]+/);
+            var m = timeArray[0];
+            var s = checkSecond((timeArray[1] - 1));
+            if (s == 59) { m = m - 1 }
+            return m + ":" + s;
+        }
+        function checkSecond(sec) {
+            if (sec < 10 && sec >= 0) { sec = "0" + sec };
+            if (sec < 0) { sec = "59" };
+            return sec;
+        }
+        $('#startGame').click(() => {
+            doTime = true;
+            $('#toggleTime').attr('disabled', false);
+            $('body').addClass('playing');
+            startTimer();
+        })
+        $('#stopGame').click(() => {
+            doTime = false;
+            $('#toggleTime').attr('disabled', true);
+        })
+        $('#resetGame').click(() => {
+            $(whiteClock).html("01:01");
+            $(blackClock).html("01:01");
+        });
+        $('#toggleTime').click(() => {
+            doBlackTime = !doBlackTime;
+            doWhiteTime = !doWhiteTime;
+        });
+    </script>
+    <script type="text/javascript" src="./timer.js"></script>
+</body>
+
+</html>
