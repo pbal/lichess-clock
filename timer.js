@@ -45,7 +45,8 @@ var myClock = $(".clock.clock_bottom"),
     hisloader = $('#hisloader'),
     myloader = $('#myloader'),
     a = 0,
-    p = Math.PI;
+    p = Math.PI,
+    timeFormatSupport = true;
 
 // read game time from lichess data obj
 try {
@@ -55,11 +56,15 @@ try {
     scr = scr.substr(0, scr.lastIndexOf(',')).trim();
     var data = $.parseJSON(scr);
 } catch(e) {
-    console.log('Clocks Chrome Extension load only while playing.')
+    console.log('Lichess Clock Chrome Extension load only while playing.');
 }
 
-if ($('body').hasClass('playing')) {
-    if (data && data.clock && data.clock.initial) {
+if (data && data.clock && data.clock.increment) {
+    timeFormatSupport = false;
+    console.warn('Pie clocks doesn\'t work well with incremental time.');
+}
+if (timeFormatSupport && $('body').hasClass('playing')) {
+    if (data && data.clock) {
         gameTime = data.clock.initial;
     } else {
         var myGameTime = getTime(myClock);
@@ -89,11 +94,11 @@ function getTime(clock) {
 function drawPie(time, loader) {
     time = 360 - time * 360 / gameTime || .1;
 
-    var r = ( time * p / 180 )
-        , x = Math.sin( r ) * 125
-        , y = Math.cos( r ) * - 125
-        , mid = ( time > 180 ) ? 0 : 1
-        , anim = 'M 0 0 v -125 A 125 125 1 '
+    var r = ( time * p / 180 ),
+        x = Math.sin( r ) * 125,
+        y = Math.cos( r ) * - 125,
+        mid = ( time > 180 ) ? 0 : 1,
+        anim = 'M 0 0 v -125 A 125 125 1 '
             + mid + ' 0 '
             +  x  + ' '
             +  y  + ' z';
