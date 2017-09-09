@@ -1,4 +1,4 @@
-console.log('lichess clock dials')
+console.log('chrome extension: lichess clock dials')
 var lichessGreen = '#759900';
 var lichessRed = '#a00000';
 
@@ -48,23 +48,23 @@ var myClock = $(".clock.clock_bottom"),
     p = Math.PI;
 
 // read game time from lichess data obj
-var scr = $("script")[2].textContent;
-scr = scr.substr(scr.indexOf('data: ') + 6);
-scr = scr.substr(0, scr.indexOf('i18n:'));
-scr = scr.substr(0, scr.lastIndexOf(',')).trim();
 try {
+    var scr = $("script")[2].textContent;
+    scr = scr.substr(scr.indexOf('data: ') + 6);
+    scr = scr.substr(0, scr.indexOf('i18n:'));
+    scr = scr.substr(0, scr.lastIndexOf(',')).trim();
     var data = $.parseJSON(scr);
 } catch(e) {
-    console.log('clocks only when you are playing')
+    console.log('Clocks Chrome Extension load only while playing.')
 }
 
 if ($('body').hasClass('playing')) {
-    if (!data.clock.initial) {
+    if (data && data.clock && data.clock.initial) {
+        gameTime = data.clock.initial;
+    } else {
         var myGameTime = getTime(myClock);
         var hisGameTime = getTime(hisClock);
         gameTime = myGameTime || hisGameTime;
-    } else {
-        gameTime = data.clock.initial;
     }
     timeout();
 }
