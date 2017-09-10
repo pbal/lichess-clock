@@ -3,6 +3,7 @@
     bottom: 0;
     height: 300px;
     width: 300px;
+    margin: 20px;
 }
 #hisburner {
      left: 350px;
@@ -10,23 +11,21 @@
 #myburner {
     left: 0;
 }
-#myburner .timer, #hisburner .timer {
-    height: 300px;
-    width: 300px;
-    overflow: hidden;
-    margin: auto;
-    position: relative;
-}
-#myburner .rotate, #hisburner .rotate {
-    height: 100%;
-    width: 100%;
-    display: block;
-    position: relative;
-    z-index: 10;
-}
 #myburner .loader {
     fill: #759900;
 }
 #hisburner .loader {
     fill: #a00000;
+}
+#myburner .spinner{
+    fill: orangered;
+}
+#hisburner .spinner {
+    fill: orangered;
+}
+.spinner.alert {
+    opacity: 1;
+}
+.spinner.hide {
+    opacity: 0;
 }

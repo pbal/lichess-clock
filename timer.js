@@ -1,11 +1,18 @@
 console.log('chrome extension: lichess clock dials');
 
 var burner = $(`
-<div class="timer">
-    <svg class="rotate" viewbox="0 0 250 250"\>
-        <path class="loader" transform="translate(125, 125)"/>
-    </svg>
-</div>
+<svg class="timer rotate" >
+    <path class="loader" transform="translate(150, 150)"/>
+    <path class="spinner hide"
+    d="M25.251,6.411c-10.318,0-18.683,8.365-18.683,18.683h4.068c0-8.071,6.543-14.615,14.615-14.615V6.461z" >
+    <animateTransform attributeType="xml" attributeName="transform"
+        type="rotate"
+        from="0 25 25"
+        to="360 25 25"
+        dur=".5s"
+        repeatCount="indefinite"/>
+    </path>
+</svg>
 `);
 
 $('body').append($(burner).clone().attr('id', 'myburner'));
@@ -14,10 +21,9 @@ $('body').append($(burner).clone().attr('id', 'hisburner'));
 var myClock = $(".clock.clock_bottom"),
     hisClock = $(".clock.clock_top"),
     gameTime = 0,
-    hisloader = $('#hisburner .loader'),
-    myloader = $('#myburner .loader'),
     a = 0,
     p = Math.PI,
+    alert = false,
     timeFormatSupport = true;
 
 // read game time from lichess data obj
@@ -50,11 +56,13 @@ function timeout() {
         var myTime = getTime(myClock);
         var hisTime = getTime(hisClock);
 
-        drawPie(myTime, myloader);
-        drawPie(hisTime, hisloader);
+        drawPie(myTime, 'myburner');
+        drawPie(hisTime, 'hisburner');
 
         if (myTime > 0 && hisTime > 0 && $('body').hasClass('playing')) {
             timeout();
+        } else {
+            $('#myburner .spinner').addClass('hide');
         }
     }, 200);
 }
@@ -63,9 +71,14 @@ function getTime(clock) {
     return toSeconds($(clock).find('.time')[0].textContent);
 }
 
-function drawPie(time, loader) {
+function drawPie(time, clockid) {
+    var clock = $('#' + clockid);
+    if (time <= 7 && !alert) {
+        $(clock).find('.spinner').addClass('alert');
+        $(clock).find('.spinner').removeClass('hide');
+        alert = true;
+    }
     time = 360 - time * 360 / gameTime || .1;
-
     var r = ( time * p / 180 ),
         x = Math.sin( r ) * 125,
         y = Math.cos( r ) * - 125,
@@ -75,7 +88,7 @@ function drawPie(time, loader) {
             +  x  + ' '
             +  y  + ' z';
 
-    $(loader).attr('d', anim);
+    $('#' + clockid +' .loader').attr('d', anim);
 }
 
 function toSeconds(time_str) {
