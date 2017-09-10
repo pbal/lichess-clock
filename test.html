@@ -1,13 +1,16 @@
 <html>
 
 <head>
-    <script type="text/javascript" src="./jquery.js"></script>
+    <script type="text/javascript" src="./node_modules/jquery/dist/jquery.slim.min.js"></script>
+    <link rel="stylesheet" href="./style.css" type="text/css" />
     <style>
         body {
             font-family: Arial, Helvetica, sans-serif;
             font-size: 14px;
             background-color: #1a1a1a;
             background-image: linear-gradient(to bottom,#2c2c2c,#1a1a1a 116px);
+            /* background: #eee;
+            background-image: linear-gradient(to bottom,#d7d7d7 0%,#eeeeee 116px); */
             color: #929292;
         }
         .buttons {
@@ -86,7 +89,7 @@
             if (doWhiteTime) $(whiteClock).html(whiteTime);
             if (doBlackTime) $(blackClock).html(blackTime);
 
-            setTimeout(startTimer, 100);
+            setTimeout(startTimer, 50);
         }
         function getTextTime(time) {
             var timeArray = time.split(/[:]+/);

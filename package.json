@@ -1,0 +1,12 @@
+{
+  "name": "lichess-clocks",
+  "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pukhrajbal/lichess-clock"
+  },
+  "devDependencies": {
+    "less": "^2.7.2",
+    "jquery": "^3.2.1"
+  }
+}

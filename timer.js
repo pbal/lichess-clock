@@ -1,52 +1,12 @@
-console.log('chrome extension: lichess clock dials')
-var lichessGreen = '#759900';
-var lichessRed = '#a00000';
+// Pie Clock design based on
+// https://medium.com/@andsens/radial-progress-indicator-using-css-a917b80c43f9
 
-$('body').append('<div id="myburner" class="timer"><svg class="rotate" viewbox="0 0 250 250"\><path id="myloader" transform="translate(125, 125)"/></svg></div>');
-$('body').append('<div id="hisburner" class="timer"><svg class="rotate" viewbox="0 0 250 250"\><path id="hisloader" transform="translate(125, 125)"/></svg></div>');
-
-$('#myburner, #hisburner').css({
-    'position': 'absolute',
-    'bottom': '0',
-    'height': '300px',
-    'width': '300px'
-});
-$('#hisburner').css({
-     'left': '350px',
-});
-$('#myburner').css({
-    'left': '0',
-});
-
-$('#myburner .timer, #hisburner .timer').css({
-    'height': '300px',
-    'width': '300px',
-    'overflow': 'hidden',
-    'margin': 'auto',
-    'position': 'relative'
-});
-$('#myburner .rotate, #hisburner .rotate').css({
-    'height': '100%',
-    'width': '100%',
-    'display': 'block',
-    'position': 'relative',
-    'z-index': '10'
-});
-$('#myloader').css({
-    'fill': lichessGreen
-});
-$(' #hisloader').css({
-    'fill': lichessRed
-});
+console.log('chrome extension: lichess clock dials');
 
 var myClock = $(".clock.clock_bottom"),
-    hisClock = $(".clock.clock_top"),
-    gameTime = 0,
-    hisloader = $('#hisloader'),
-    myloader = $('#myloader'),
-    a = 0,
-    p = Math.PI,
-    timeFormatSupport = true;
+hisClock = $(".clock.clock_top"),
+gameTime = 0,
+timeFormatSupport = true;
 
 // read game time from lichess data obj
 try {
@@ -56,13 +16,14 @@ try {
     scr = scr.substr(0, scr.lastIndexOf(',')).trim();
     var data = $.parseJSON(scr);
 } catch(e) {
-    console.log('Lichess Clock Chrome Extension load only while playing.');
+    console.warn('Lichess Clock Chrome Extension load only while playing.');
 }
 
 if (data && data.clock && data.clock.increment) {
     timeFormatSupport = false;
     console.warn('Pie clocks doesn\'t work well with incremental time.');
 }
+
 if (timeFormatSupport && $('body').hasClass('playing')) {
     if (data && data.clock) {
         gameTime = data.clock.initial;
@@ -71,18 +32,49 @@ if (timeFormatSupport && $('body').hasClass('playing')) {
         var hisGameTime = getTime(hisClock);
         gameTime = myGameTime || hisGameTime;
     }
-    timeout();
 }
-function timeout() {
+
+$(document).ready(() => {
+    if (gameTime) {
+        buildClocks();
+        checkTime();
+    }
+});
+
+function buildClocks() {
+
+    var dial = $(`
+    <div class="radial" data-time="0">
+        <div class="circle">
+            <div class="mask full">
+                <div class="fill"></div>
+            </div>
+            <div class="mask half">
+                <div class="fill"></div>
+                <div class="fill fix"></div>
+            </div>
+
+            <div class="shadow"></div>
+
+        </div>
+    </div>`);
+    $('body').append($(dial).clone().attr('id', 'myloader'));
+    $('body').append($(dial).clone().attr('id', 'hisloader'));
+
+    var hisloader = $('#hisloader'),
+        myloader = $('#myloader');
+}
+
+function checkTime() {
     setTimeout(() => {
         var myTime = getTime(myClock);
         var hisTime = getTime(hisClock);
 
         drawPie(myTime, myloader);
         drawPie(hisTime, hisloader);
-
+        console.log(myTime  )
         if (myTime > 0 && hisTime > 0 && $('body').hasClass('playing')) {
-            timeout();
+            checkTime();
         }
     }, 200);
 }
@@ -92,18 +84,9 @@ function getTime(clock) {
 }
 
 function drawPie(time, loader) {
-    time = 360 - time * 360 / gameTime || .1;
-
-    var r = ( time * p / 180 ),
-        x = Math.sin( r ) * 125,
-        y = Math.cos( r ) * - 125,
-        mid = ( time > 180 ) ? 0 : 1,
-        anim = 'M 0 0 v -125 A 125 125 1 '
-            + mid + ' 0 '
-            +  x  + ' '
-            +  y  + ' z';
-
-    $(loader).attr('d', anim);
+    time = gameTime - time;
+    var percentage = time / gameTime * 100;
+    $(loader).attr('data-time', parseInt(percentage));
 }
 
 function toSeconds(time_str) {
