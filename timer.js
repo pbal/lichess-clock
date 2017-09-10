@@ -1,49 +1,21 @@
-console.log('chrome extension: lichess clock dials')
-var lichessGreen = '#759900';
-var lichessRed = '#a00000';
+console.log('chrome extension: lichess clock dials');
 
-$('body').append('<div id="myburner" class="timer"><svg class="rotate" viewbox="0 0 250 250"\><path id="myloader" transform="translate(125, 125)"/></svg></div>');
-$('body').append('<div id="hisburner" class="timer"><svg class="rotate" viewbox="0 0 250 250"\><path id="hisloader" transform="translate(125, 125)"/></svg></div>');
+var burner = $(`
+<div class="timer">
+    <svg class="rotate" viewbox="0 0 250 250"\>
+        <path class="loader" transform="translate(125, 125)"/>
+    </svg>
+</div>
+`);
 
-$('#myburner, #hisburner').css({
-    'position': 'absolute',
-    'bottom': '0',
-    'height': '300px',
-    'width': '300px'
-});
-$('#hisburner').css({
-     'left': '350px',
-});
-$('#myburner').css({
-    'left': '0',
-});
-
-$('#myburner .timer, #hisburner .timer').css({
-    'height': '300px',
-    'width': '300px',
-    'overflow': 'hidden',
-    'margin': 'auto',
-    'position': 'relative'
-});
-$('#myburner .rotate, #hisburner .rotate').css({
-    'height': '100%',
-    'width': '100%',
-    'display': 'block',
-    'position': 'relative',
-    'z-index': '10'
-});
-$('#myloader').css({
-    'fill': lichessGreen
-});
-$(' #hisloader').css({
-    'fill': lichessRed
-});
+$('body').append($(burner).clone().attr('id', 'myburner'));
+$('body').append($(burner).clone().attr('id', 'hisburner'));
 
 var myClock = $(".clock.clock_bottom"),
     hisClock = $(".clock.clock_top"),
     gameTime = 0,
-    hisloader = $('#hisloader'),
-    myloader = $('#myloader'),
+    hisloader = $('#hisburner .loader'),
+    myloader = $('#myburner .loader'),
     a = 0,
     p = Math.PI,
     timeFormatSupport = true;

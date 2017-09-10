@@ -9,9 +9,12 @@
                 "http://lichess.org/*",
                 "https://lichess.org/*"
             ],
+            "css": [
+                "./style.css"
+            ],
             "js": [
-                "jquery.js",
-                "timer.js"
+                "./jquery.js",
+                "./timer.js"
             ]
         }
     ]
