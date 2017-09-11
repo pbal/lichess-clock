@@ -91,10 +91,9 @@ function drawPie(time, clockid) {
     $('#' + clockid +' .loader').attr('d', anim);
 }
 
-function toSeconds(time_str) {
-    if (time_str.indexOf('.') !== -1) {
-        time_str = time_str.substr(0, time_str.indexOf('.'))
-    }
-    var parts = time_str.split(':');
-    return parseInt(parts[0]) * 60 + parseInt(parts[1]);
+function toSeconds(time) {
+    time = time.trim();
+    var parts = time.split(':');
+    var val = parseInt(parts[0]) * 60 + parseInt(parts[1].split('.')[0]) + ((parseInt(parts[1].split('.')[1]) || 0) / 10);
+    return val;
 }
