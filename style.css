@@ -1,9 +1,9 @@
 #myburner, #hisburner {
     position: absolute;
     bottom: 0;
-    height: 300px;
-    width: 300px;
-    margin: 20px;
+    height: 280px;
+    width: 280px;
+    margin: 10px;
 }
 #hisburner {
      left: 350px;
