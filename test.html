@@ -58,13 +58,13 @@
     <div class="timers">
         <div id="whiteTimer" class="clock clock_bottom">
             <span>White</span>
-            <span class="time">05:11
+            <span class="time">00:10
             </span>
         </div>
         <div id="blackTimer" class="clock clock_top">
             <span>Black</span>
             <span class="time">
-                    05:11</span>
+                    00:10</span>
         </div>
     </div>
     <script type="text/javascript">
@@ -73,7 +73,8 @@
         var doBlackTime = false;
         var whiteClock = $('#whiteTimer .time');
         var blackClock = $('#blackTimer .time');
-        function startTimer() {
+        var increment = false;
+        function startTimer(increment) {
 
             if (!doTime) return;
 
@@ -81,10 +82,10 @@
             var blackTime = $(blackClock).text();
 
             if (doWhiteTime) {
-                whiteTime = getTextTime(whiteTime);
+                whiteTime = getTextTime(whiteTime, increment);
             }
             if (doBlackTime) {
-                blackTime = getTextTime(blackTime);
+                blackTime = getTextTime(blackTime, increment);
             }
             doTime = doTime && parseInt(whiteTime.replace(':', ''));
             doTime = doTime && parseInt(blackTime.replace(':', ''));
@@ -92,12 +93,13 @@
             if (doWhiteTime) $(whiteClock).html(whiteTime);
             if (doBlackTime) $(blackClock).html(blackTime);
 
-            setTimeout(startTimer, 100);
+            setTimeout(startTimer, 1000);
         }
-        function getTextTime(time) {
+        function getTextTime(time, increment) {
             var timeArray = time.split(/[:]+/);
             var m = timeArray[0];
-            var s = checkSecond((timeArray[1] - 1));
+            var s = parseInt(timeArray[1]);
+            s = checkSecond(increment ? s + 2 : s - 1);
             if (s == 59) { m = m - 1 }
             return m + ":" + s;
         }
@@ -109,18 +111,23 @@
         $('#startGame').click(() => {
             doTime = true;
             $('#toggleTime').attr('disabled', false);
-            $('body').addClass('playing');
+            $('#startGame').attr('disabled', true);
             startTimer();
         })
         $('#stopGame').click(() => {
             doTime = false;
             $('#toggleTime').attr('disabled', true);
+            $('#startGame').attr('disabled', false);
         })
         $('#resetGame').click(() => {
             $(whiteClock).html("05:11");
             $(blackClock).html("05:11");
         });
         $('#toggleTime').click(() => {
+            if (increment) {
+                if (doWhiteTime) $(whiteClock).html(getTextTime($(whiteClock).text(), true));
+                if (doBlackTime) $(blackClock).html(getTextTime($(blackClock).text(), true));
+            }
             doBlackTime = !doBlackTime;
             doWhiteTime = !doWhiteTime;
         });
@@ -131,7 +138,8 @@
             try {
                 LichessRound.boot({
                     data: { "game": { "id": "rH58WkXj", "variant": { "key": "standard", "name": "Standard", "short": "Std" }, "speed": "blitz", "perf": "blitz", "rated": false, "initialFen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", "fen": "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1", "player": "black", "turns": 1, "startedAtTurn": 0, "source": "ai", "status": { "id": 20, "name": "started" }, "createdAt": 1504908633774, "lastMove": "e2e4" }, "player": { "color": "black", "id": "ifQE", "version": 1, "onGame": true }, "opponent": { "color": "white", "ai": 1, "onGame": true }, "url": { "socket": "/rH58WkXjifQE/socket/v2", "round": "/rH58WkXjifQE" }, "pref": { "animationDuration": 100, "coords": 2, "replay": 2, "autoQueen": 2, "clockTenths": 1, "moveEvent": 2, "clockBar": true, "clockSound": true, "confirmResign": true, "rookCastle": true, "highlight": true, "destination": true, "enablePremove": true, "showCaptured": true }, "clock": { "running": false,
-                        "initial": 311, "increment": 0, "white": 180, "black": 180, "emerg": 22, "moretime": 15 }, "takebackable": true, "possibleMoves": { "f7": "f6f5", "g8": "f6h6", "g7": "g6g5", "b7": "b6b5", "e7": "e6e5", "b8": "a6c6", "h7": "h6h5", "d7": "d6d5", "c7": "c6c5", "a7": "a6a5" }, "steps": [{ "ply": 0, "uci": null, "san": null, "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" }, { "ply": 1, "uci": "e2e4", "san": "e4", "fen": "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1" }] },
+                        "initial": 10,
+                        "increment": 0, "white": 180, "black": 180, "emerg": 22, "moretime": 15 }, "takebackable": true, "possibleMoves": { "f7": "f6f5", "g8": "f6h6", "g7": "g6g5", "b7": "b6b5", "e7": "e6e5", "b8": "a6c6", "h7": "h6h5", "d7": "d6d5", "c7": "c6c5", "a7": "a6a5" }, "steps": [{ "ply": 0, "uci": null, "san": null, "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" }, { "ply": 1, "uci": "e2e4", "san": "e4", "fen": "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1" }] },
                     i18n:
                     { "flipBoard": "Flip board", "aiNameLevelAiLevel": "%1$s level %2$s", "yourTurn": "Your turn", "abortGame": "Abort game", "proposeATakeback": "Propose a takeback", "offerDraw": "Offer draw", "resign": "Resign", "opponentLeftChoices": "The other player may have left the game. You can claim victory, call the game a draw, or wait.", "forceResignation": "Claim victory", "forceDraw": "Call draw", "threefoldRepetition": "Threefold repetition", "claimADraw": "Claim a draw", "drawOfferSent": "Draw offer sent", "cancel": "Cancel", "yourOpponentOffersADraw": "Your opponent offers a draw", "accept": "Accept", "decline": "Decline", "takebackPropositionSent": "Takeback sent", "yourOpponentProposesATakeback": "Your opponent proposes a takeback", "youHaveNbSecondsToMakeYourFirstMove:one": "You have %s second to make your first move!", "youHaveNbSecondsToMakeYourFirstMove": "You have %s seconds to make your first move!", "thisPlayerUsesChessComputerAssistance": "This player uses chess computer assistance", "gameAborted": "Game aborted", "checkmate": "Checkmate", "whiteResigned": "White resigned", "blackResigned": "Black resigned", "stalemate": "Stalemate", "whiteLeftTheGame": "White left the game", "blackLeftTheGame": "Black left the game", "draw": "Draw", "timeOut": "Time out", "whiteIsVictorious": "White is victorious", "blackIsVictorious": "Black is victorious", "kingInTheCenter": "King in the center", "threeChecks": "Three checks", "variantEnding": "Variant ending", "withdraw": "Withdraw", "rematch": "Rematch", "rematchOfferSent": "Rematch offer sent", "rematchOfferAccepted": "Rematch offer accepted", "waitingForOpponent": "Waiting for opponent", "cancelRematchOffer": "Cancel rematch offer", "newOpponent": "New opponent", "moveConfirmation": "Move confirmation", "viewRematch": "View rematch", "whitePlays": "White to play", "blackPlays": "Black to play", "giveNbSeconds:one": "Give %s seconds", "giveNbSeconds": "Give %s seconds", "giveMoreTime": "Give more time", "gameOver": "Game Over", "analysis": "Analysis board", "yourOpponentWantsToPlayANewGameWithYou": "Your opponent wants to play a new game with you", "oneDay": "One day", "nbDays:one": "%s day", "nbDays": "%s days", "nbHours:one": "%s hour", "nbHours": "%s hours" }
                     ,

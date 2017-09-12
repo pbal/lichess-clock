@@ -1,11 +1,11 @@
-#myburner, #hisburner {
+#myburner, #opburner {
     position: absolute;
     bottom: 0;
     height: 280px;
     width: 280px;
     margin: 10px;
 }
-#hisburner {
+#opburner {
      left: 350px;
 }
 #myburner {
@@ -14,16 +14,19 @@
 #myburner .loader {
     fill: #759900;
 }
-#hisburner .loader {
+#myburner .oploader {
+    fill: #a00000;
+}
+#opburner .loader {
     fill: #a00000;
 }
 #myburner .spinner{
     fill: orangered;
 }
-#hisburner .spinner {
+#opburner .spinner {
     fill: orangered;
 }
-.spinner.alert {
+.spinner {
     opacity: 1;
 }
 .spinner.hide {
