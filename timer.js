@@ -115,7 +115,7 @@ function toSeconds(time) {
     var m = parseInt(parts[0]);
     var secParts = parts[1].split('.');
     var s = parseInt(secParts[0]);
-    var h = secParts.length > 1 ? parseInt(parts[1].split('.')[1].substr(0, 1)) : 0;
+    var h = secParts.length > 1 ? parseInt(secParts[1].substr(0, 1)) : 0;
     var val = m * 60 + s + h / 10;
     return val;
 }
