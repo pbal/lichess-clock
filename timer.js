@@ -69,8 +69,8 @@ function timeout() {
         if (myTime > 0 && opTime > 0 && $('body').hasClass('playing')) {
             timeout();
         } else {
-            $('#myburner .spinner').addClass('hide');
-            $('#hisburner .spinner').addClass('hide');
+            $('#myBurner .spinner').addClass('hide');
+            $('#opBurner .spinner').addClass('hide');
         }
     }, 100);
 }
