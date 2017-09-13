@@ -15,15 +15,16 @@ var burner = $(`
     </svg>
 `);
 
-$('body').append($(burner).clone().attr('id', 'myBurner'));
-$('body').append($(burner).clone().attr('id', 'opBurner'));
+var myBurner = $(burner).clone().attr('id', 'myBurner');
+var opBurner = $(burner).clone().attr('id', 'opBurner');
 
-var myClock = $('.clock.clock_bottom'),
-    hisClock = $('.clock.clock_top'),
-    myBurner = $('#myBurner'),
-    opBurner = $('#opBurner'),
-    mySpinner = $('#myBurner .spinner'),
-    opSpinner = $('#opBurner .spinner'),
+$('body').append(opBurner);
+$('body').append(myBurner);
+
+var myClock = $('#lichess .clock.clock_bottom'),
+    hisClock = $('#lichess  .clock.clock_top'),
+    mySpinner = $(myBurner).find('.spinner'),
+    opSpinner = $(opBurner).find('.spinner'),
     gameTime = null,
     a = 0,
     p = Math.PI,
@@ -61,19 +62,27 @@ function timeout() {
         var opTime = getTime(hisClock);
 
         if (data && data.clock && data.clock.increment) {
-            drawPie(myTime, myBurner, mySpinner, opTime);
+            drawIncrementDial(myTime, opTime);
         }
         else {
-            drawPie(myTime, myBurner, mySpinner);
-            drawPie(opTime, opBurner, opSpinner);
+            drawSeparateDials(myTime, opTime);
         }
         if (myTime > 0 && opTime > 0 && $('body').hasClass('playing')) {
             timeout();
         } else {
-            $('#myBurner .spinner').addClass('hide');
-            $('#opBurner .spinner').addClass('hide');
+            $(mySpinner).addClass('hide');
+            $(opSpinner).addClass('hide');
         }
     }, 200);
+}
+
+function drawSeparateDials(myTime, opTime) {
+    drawPie(myTime, myBurner, mySpinner, opTime);
+}
+
+function drawSeparateDials(myTime, opTime) {
+    drawPie(myTime, myBurner, mySpinner);
+    drawPie(opTime, opBurner, opSpinner);
 }
 
 function getTime(clock) {
@@ -99,19 +108,18 @@ function drawPie(time, clock, spinner, opTime = null) {
 
 function pie(time, loader, reverse) {
     var r = ( time * p / 180 ),
-    x = Math.sin( r ) * 125,
-    y = Math.cos( r ) * - 125,
-    mid = ( time > 180) ? reverse ? 1 : 0 : reverse ? 0 : 1,
-    anim = 'M 0 0 v -125 A 125 125 1 '
-        + mid + (reverse ? ' 1 ' : ' 0 ')
-        +  x  + ' '
-        +  y  + ' z';
+        x = Math.sin( r ) * 125,
+        y = Math.cos( r ) * - 125,
+        mid = ( time > 180) ? reverse ? 1 : 0 : reverse ? 0 : 1,
+        anim = 'M 0 0 v -125 A 125 125 1 '
+            + mid + (reverse ? ' 1 ' : ' 0 ')
+            +  x  + ' '
+            +  y  + ' z';
     $(loader).attr('d', anim);
 }
 
 function toSeconds(time) {
-    time = time.trim();
-    var parts = time.split(':');
+    var parts = time.trim().split(':');
     var m = parseInt(parts[0]);
     var secParts = parts[1].split('.');
     var s = parseInt(secParts[0]);
