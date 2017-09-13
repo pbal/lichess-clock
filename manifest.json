@@ -13,7 +13,6 @@
                 "./style.css"
             ],
             "js": [
-                "./jquery.js",
                 "./timer.js"
             ]
         }

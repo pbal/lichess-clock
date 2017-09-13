@@ -1,30 +1,35 @@
 console.log('chrome extension: lichess clock dials');
 
-var burner = $(`
-    <svg class='timer rotate'>
-        <path class='loader' transform='translate(140, 140)'/>
-        <path class='oploader' transform='translate(140, 140)'/>
-        <path class='spinner hide'
+var burner = `
+<svg class='timer rotate'>
+    <path class='loader' transform='translate(140, 140)'/>
+    <path class='oploader' transform='translate(140, 140)'/>
+    <path class='spinner hide'
             d='M25.251,6.411c-10.318,0-18.683,8.365-18.683,18.683h4.068c0-8.071,6.543-14.615,14.615-14.615V6.461z' >
         <animateTransform attributeType='xml' attributeName='transform'
             type='rotate'
             from='0 25 25'
             to='360 25 25'
             dur='.5s' repeatCount='indefinite'/>
-        </path>
-    </svg>
-`);
+    </path>
+</svg>
+`;
+var myBurner = document.createElement('div');
+var opBurner = document.createElement('div');
 
-var myBurner = $(burner).clone().attr('id', 'myBurner');
-var opBurner = $(burner).clone().attr('id', 'opBurner');
+myBurner.setAttribute('id', 'myBurner');
+opBurner.setAttribute('id', 'opBurner');
 
-$('body').append(opBurner);
-$('body').append(myBurner);
+myBurner.innerHTML = burner;
+opBurner.innerHTML = burner;
 
-var myClock = $('#lichess .clock.clock_bottom'),
-    hisClock = $('#lichess  .clock.clock_top'),
-    mySpinner = $(myBurner).find('.spinner'),
-    opSpinner = $(opBurner).find('.spinner'),
+document.body.appendChild(opBurner);
+document.body.appendChild(myBurner);
+
+var myClock = document.querySelector('#lichess .clock.clock_bottom'),
+    opClock = document.querySelector('#lichess .clock.clock_top'),
+    mySpinner = myBurner.querySelector('.spinner'),
+    opSpinner = opBurner.querySelector('.spinner'),
     gameTime = null,
     a = 0,
     p = Math.PI,
@@ -33,21 +38,21 @@ var myClock = $('#lichess .clock.clock_bottom'),
 
 // read game time from lichess data obj
 try {
-    var scr = $('script')[2].textContent;
-    scr = scr.substr(scr.indexOf('data: ') + 6);
-    scr = scr.substr(0, scr.indexOf('i18n:'));
-    scr = scr.substr(0, scr.lastIndexOf(',')).trim();
-    var data = $.parseJSON(scr);
+    var script = document.querySelectorAll('script')[2].textContent;
+    script = script.substr(script.indexOf('data: ') + 6);
+    script = scr.substr(0, script.indexOf('i18n:'));
+    script = script.substr(0, script.lastIndexOf(',')).trim();
+    var data = JSON.parse(script);
 } catch(e) {
     console.log('Lichess Clock Chrome Extension works only while playing.');
 }
 
-if (timeFormatSupport && $('body').hasClass('playing')) {
+if (timeFormatSupport && document.body.classList.contains('playing')) {
     if (data && data.clock) {
         gameTime = data.clock.initial;
     } else {
         var myGameTime = getTime(myClock);
-        var hisGameTime = getTime(hisClock);
+        var opGameTime = getTime(opClock);
         gameTime = myGameTime || hisGameTime;
     }
     // dont show when game time is not determined
@@ -59,7 +64,7 @@ if (timeFormatSupport && $('body').hasClass('playing')) {
 function timeout() {
     setTimeout(() => {
         var myTime = getTime(myClock);
-        var opTime = getTime(hisClock);
+        var opTime = getTime(opClock);
 
         if (data && data.clock && data.clock.increment) {
             drawIncrementDial(myTime, opTime);
@@ -67,11 +72,12 @@ function timeout() {
         else {
             drawSeparateDials(myTime, opTime);
         }
-        if (myTime > 0 && opTime > 0 && $('body').hasClass('playing')) {
+
+        if (myTime > 0 && opTime > 0 && document.body.classList.contains('playing')) {
             timeout();
         } else {
-            $(mySpinner).addClass('hide');
-            $(opSpinner).addClass('hide');
+            mySpinner.classList.add('hide');
+            opSpinner.classList.add('hide');
         }
     }, 200);
 }
@@ -86,23 +92,23 @@ function drawSeparateDials(myTime, opTime) {
 }
 
 function getTime(clock) {
-    var timer = $(clock).find('.time');
-    return timer.length ? toSeconds(timer[0].textContent) : 0;
+    var timer = clock.querySelector('.time');
+    return timer ? toSeconds(timer.textContent) : 0;
 }
 
 function drawPie(time, clock, spinner, opTime = null) {
 
-    $(spinner).addClass(time >= 7 ? 'hide' : '');
-    $(spinner).removeClass(time < 7 ? 'hide' : '');
+    if (time >= 7) spinner.classList.add('hide');
+    else spinner.classList.remove('hide');
 
     if (opTime !== null) {
         var m = (360 - (time / (time + opTime)) * 360) || .01;
         var h = ((opTime / (time + opTime)) * 360) || .01;
-        pie(m, $(clock).find('.loader'));
-        pie(h, $(clock).find('.oploader'), true);
+        pie(m, clock.querySelector('.loader'));
+        pie(h, clock.querySelector('.oploader'), true);
     } else {
         time = 360 - time * 360 / gameTime || .01;
-        pie(time, $(clock).find('.loader'), false);
+        pie(time, clock.querySelector('.loader'), false);
     }
 }
 
@@ -115,7 +121,7 @@ function pie(time, loader, reverse) {
             + mid + (reverse ? ' 1 ' : ' 0 ')
             +  x  + ' '
             +  y  + ' z';
-    $(loader).attr('d', anim);
+    loader.setAttribute('d', anim);
 }
 
 function toSeconds(time) {
