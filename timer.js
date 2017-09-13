@@ -1,18 +1,18 @@
 console.log('chrome extension: lichess clock dials');
 
 var burner = $(`
-<svg class='timer rotate'>
-    <path class='loader' transform='translate(140, 140)'/>
-    <path class='oploader' transform='translate(140, 140)'/>
-    <path class='spinner hide'
-        d='M25.251,6.411c-10.318,0-18.683,8.365-18.683,18.683h4.068c0-8.071,6.543-14.615,14.615-14.615V6.461z' >
-    <animateTransform attributeType='xml' attributeName='transform'
-        type='rotate'
-        from='0 25 25'
-        to='360 25 25'
-        dur='.5s' repeatCount='indefinite'/>
-    </path>
-</svg>
+    <svg class='timer rotate'>
+        <path class='loader' transform='translate(140, 140)'/>
+        <path class='oploader' transform='translate(140, 140)'/>
+        <path class='spinner hide'
+            d='M25.251,6.411c-10.318,0-18.683,8.365-18.683,18.683h4.068c0-8.071,6.543-14.615,14.615-14.615V6.461z' >
+        <animateTransform attributeType='xml' attributeName='transform'
+            type='rotate'
+            from='0 25 25'
+            to='360 25 25'
+            dur='.5s' repeatCount='indefinite'/>
+        </path>
+    </svg>
 `);
 
 $('body').append($(burner).clone().attr('id', 'myBurner'));
@@ -54,6 +54,7 @@ if (timeFormatSupport && $('body').hasClass('playing')) {
         timeout();
     }
 }
+
 function timeout() {
     setTimeout(() => {
         var myTime = getTime(myClock);
@@ -72,7 +73,7 @@ function timeout() {
             $('#myBurner .spinner').addClass('hide');
             $('#opBurner .spinner').addClass('hide');
         }
-    }, 100);
+    }, 200);
 }
 
 function getTime(clock) {
@@ -95,6 +96,7 @@ function drawPie(time, clock, spinner, opTime = null) {
         pie(time, $(clock).find('.loader'), false);
     }
 }
+
 function pie(time, loader, reverse) {
     var r = ( time * p / 180 ),
     x = Math.sin( r ) * 125,
@@ -104,13 +106,16 @@ function pie(time, loader, reverse) {
         + mid + (reverse ? ' 1 ' : ' 0 ')
         +  x  + ' '
         +  y  + ' z';
-
     $(loader).attr('d', anim);
 }
 
 function toSeconds(time) {
     time = time.trim();
     var parts = time.split(':');
-    var val = parseInt(parts[0]) * 60 + parseInt(parts[1].split('.')[0]) + ((parseInt(parts[1].split('.')[1]) || 0) / 10);
+    var m = parseInt(parts[0]);
+    var secParts = parts[1].split('.');
+    var s = parseInt(secParts[0]);
+    var h = secParts.length > 1 ? parseInt(parts[1].split('.')[1].substr(0, 1)) : 0;
+    var val = m * 60 + s + h / 10;
     return val;
 }
