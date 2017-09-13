@@ -1,29 +1,29 @@
-#myburner, #opburner {
+#myBurner, #opBurner {
     position: absolute;
     bottom: 0;
     height: 280px;
     width: 280px;
     margin: 10px;
 }
-#opburner {
+#opBurner {
      left: 350px;
 }
-#myburner {
+#myBurner {
     left: 0;
 }
-#myburner .loader {
+#myBurner .loader {
     fill: #759900;
 }
-#myburner .oploader {
+#myBurner .oploader {
     fill: #a00000;
 }
-#opburner .loader {
+#opBurner .loader {
     fill: #a00000;
 }
-#myburner .spinner{
+#myBurner .spinner{
     fill: orangered;
 }
-#opburner .spinner {
+#opBurner .spinner {
     fill: orangered;
 }
 .spinner {
