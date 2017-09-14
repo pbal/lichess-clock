@@ -38,7 +38,7 @@ var myClock = document.querySelector('#lichess .clock.clock_bottom'),
     p = Math.PI,
     alert = true,
     timeFormatSupport = true,
-    isisAlertOn = false;
+    isAlertOn = false;
 
 // read game time from lichess data obj
 try {
@@ -87,7 +87,7 @@ function timeout() {
 }
 
 function drawIncrementDial(myTime, opTime) {
-    drawPie(myTime, myBurner, mySpinner, opTime);
+    drawPie(myTime, myBurner, mySpinner, myLoader, opTime);
 }
 
 function drawSeparateDials(myTime, opTime) {
@@ -105,11 +105,11 @@ function drawPie(time, clock, spinner, loader, opTime = null) {
         spinner.classList.remove('hide');
         isAlertOn = true;
     }
-    else if (opTime !== null && isAlertOn) {
+    else if (time >= 7 && opTime !== null && isAlertOn) {
         spinner.classList.add('hide');
         isAlertOn = false;
     }
-    
+
     if (opTime === null) {
         // 2 dials
         time = 360 - time * 360 / gameTime || .01;
