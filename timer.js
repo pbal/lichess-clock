@@ -40,7 +40,7 @@ var myClock = document.querySelector('#lichess .clock.clock_bottom'),
 try {
     var script = document.querySelectorAll('script')[2].textContent;
     script = script.substr(script.indexOf('data: ') + 6);
-    script = scr.substr(0, script.indexOf('i18n:'));
+    script = script.substr(0, script.indexOf('i18n:'));
     script = script.substr(0, script.lastIndexOf(',')).trim();
     var data = JSON.parse(script);
 } catch(e) {
@@ -82,7 +82,7 @@ function timeout() {
     }, 200);
 }
 
-function drawSeparateDials(myTime, opTime) {
+function drawIncrementDial(myTime, opTime) {
     drawPie(myTime, myBurner, mySpinner, opTime);
 }
 
