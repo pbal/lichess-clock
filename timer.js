@@ -26,6 +26,9 @@ opBurner.innerHTML = burner;
 document.body.appendChild(opBurner);
 document.body.appendChild(myBurner);
 
+var myLoader = myBurner.querySelector('.loader');
+var opLoader = opBurner.querySelector('.loader');
+
 var myClock = document.querySelector('#lichess .clock.clock_bottom'),
     opClock = document.querySelector('#lichess .clock.clock_top'),
     mySpinner = myBurner.querySelector('.spinner'),
@@ -34,7 +37,8 @@ var myClock = document.querySelector('#lichess .clock.clock_bottom'),
     a = 0,
     p = Math.PI,
     alert = true,
-    timeFormatSupport = true;
+    timeFormatSupport = true,
+    isisAlertOn = false;
 
 // read game time from lichess data obj
 try {
@@ -87,8 +91,8 @@ function drawIncrementDial(myTime, opTime) {
 }
 
 function drawSeparateDials(myTime, opTime) {
-    drawPie(myTime, myBurner, mySpinner);
-    drawPie(opTime, opBurner, opSpinner);
+    drawPie(myTime, myBurner, mySpinner, myLoader);
+    drawPie(opTime, opBurner, opSpinner, opLoader);
 }
 
 function getTime(clock) {
@@ -96,19 +100,26 @@ function getTime(clock) {
     return timer ? toSeconds(timer.textContent) : 0;
 }
 
-function drawPie(time, clock, spinner, opTime = null) {
-
-    if (time >= 7) spinner.classList.add('hide');
-    else spinner.classList.remove('hide');
-
-    if (opTime !== null) {
+function drawPie(time, clock, spinner, loader, opTime = null) {
+    if (time < 7 && !isAlertOn) {
+        spinner.classList.remove('hide');
+        isAlertOn = true;
+    }
+    else if (opTime !== null && isAlertOn) {
+        spinner.classList.add('hide');
+        isAlertOn = false;
+    }
+    
+    if (opTime === null) {
+        // 2 dials
+        time = 360 - time * 360 / gameTime || .01;
+        pie(time, loader, false);
+    } else {
+        // incremental 1 dial
         var m = (360 - (time / (time + opTime)) * 360) || .01;
         var h = ((opTime / (time + opTime)) * 360) || .01;
-        pie(m, clock.querySelector('.loader'));
+        pie(m, loader);
         pie(h, clock.querySelector('.oploader'), true);
-    } else {
-        time = 360 - time * 360 / gameTime || .01;
-        pie(time, clock.querySelector('.loader'), false);
     }
 }
 
@@ -121,7 +132,7 @@ function pie(time, loader, reverse) {
             + mid + (reverse ? ' 1 ' : ' 0 ')
             +  x  + ' '
             +  y  + ' z';
-    loader.setAttribute('d', anim);
+        loader.setAttribute('d', anim);
 }
 
 function toSeconds(time) {
