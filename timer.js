@@ -1,43 +1,11 @@
 console.log('chrome extension: lichess clock dials');
 
-var burner = `
-<svg class='timer rotate'>
-    <path class='loader' transform='translate(140, 140)'/>
-    <path class='oploader' transform='translate(140, 140)'/>
-    <path class='spinner hide'
-            d='M25.251,6.411c-10.318,0-18.683,8.365-18.683,18.683h4.068c0-8.071,6.543-14.615,14.615-14.615V6.461z' >
-        <animateTransform attributeType='xml' attributeName='transform'
-            type='rotate'
-            from='0 25 25'
-            to='360 25 25'
-            dur='.5s' repeatCount='indefinite'/>
-    </path>
-</svg>
-`;
-var myBurner = document.createElement('div');
-var opBurner = document.createElement('div');
-
-myBurner.setAttribute('id', 'myBurner');
-opBurner.setAttribute('id', 'opBurner');
-
-myBurner.innerHTML = burner;
-opBurner.innerHTML = burner;
-
-document.body.appendChild(opBurner);
-document.body.appendChild(myBurner);
-
-var myLoader = myBurner.querySelector('.loader');
-var opLoader = opBurner.querySelector('.loader');
-
 var myClock = document.querySelector('#lichess .clock.clock_bottom'),
     opClock = document.querySelector('#lichess .clock.clock_top'),
-    mySpinner = myBurner.querySelector('.spinner'),
-    opSpinner = opBurner.querySelector('.spinner'),
     gameTime = null,
     a = 0,
     p = Math.PI,
     alert = true,
-    timeFormatSupport = true,
     isAlertOn = false;
 
 // read game time from lichess data obj
@@ -51,23 +19,59 @@ try {
     console.log('Lichess Clock data not available on this page for clocks chrome extension.');
 }
 
-if (timeFormatSupport && document.body.classList.contains('playing')) {
+if (document.body.classList.contains('playing')) {
     if (data && data.clock) {
         gameTime = data.clock.initial;
     } else {
-        var myGameTime = getTime(myClock);
-        var opGameTime = getTime(opClock);
+        var myGameTime = readTime(myClock);
+        var opGameTime = readTime(opClock);
         gameTime = myGameTime || hisGameTime;
     }
     // dont show when game time is not determined
     if (gameTime !== null) {
+        insertClocks();
         drawDial(true);
         timeout();
     }
 }
+
+function insertClocks() {
+    var burner = `
+    <svg class='timer rotate'>
+        <path class='loader' transform='translate(140, 140)'/>
+        <path class='oploader' transform='translate(140, 140)'/>
+        <path class='spinner hide'
+                d='M25.251,6.411c-10.318,0-18.683,8.365-18.683,18.683h4.068c0-8.071,6.543-14.615,14.615-14.615V6.461z' >
+            <animateTransform attributeType='xml' attributeName='transform'
+                type='rotate'
+                from='0 25 25'
+                to='360 25 25'
+                dur='.5s' repeatCount='indefinite'/>
+        </path>
+    </svg>
+    `;
+    window.myBurner = document.createElement('div');
+    window.opBurner = document.createElement('div');
+
+    myBurner.setAttribute('id', 'myBurner');
+    opBurner.setAttribute('id', 'opBurner');
+
+    myBurner.innerHTML = burner;
+    opBurner.innerHTML = burner;
+
+    document.body.appendChild(opBurner);
+    document.body.appendChild(myBurner);
+
+    window.myLoader = myBurner.querySelector('.loader');
+    window.opIncLoader = myBurner.querySelector('.oploader');
+    window.opLoader = opBurner.querySelector('.loader');
+    window.mySpinner = myBurner.querySelector('.spinner');
+    window.opSpinner = opBurner.querySelector('.spinner');
+}
+
 function drawDial(force) {
-    var myTime = getTime(myClock);
-    var opTime = getTime(opClock);
+    var myTime = readTime(myClock);
+    var opTime = readTime(opClock);
     if (data && data.clock && data.clock.increment) {
         drawIncrementDial(myTime, opTime);
     }
@@ -78,7 +82,7 @@ function drawDial(force) {
 
 function timeout() {
     setTimeout(() => {
-        drawDial(false);
+        drawDial(true); // turning true - li clock may go to 0 and this might skip update
 
         if (document.body.classList.contains('playing')) {
             timeout();
@@ -86,28 +90,28 @@ function timeout() {
             mySpinner.classList.add('hide');
             opSpinner.classList.add('hide');
         }
-    }, 100);
+    }, 200);
 }
 
 function drawIncrementDial(myTime, opTime) {
-    drawPie(myTime, myBurner, mySpinner, myLoader, opTime);
+    drawPie(myTime, myBurner, mySpinner, myLoader, opTime, opIncLoader);
 }
 
 function drawSeparateDials(myTime, opTime, force) {
     if (force || myClock.classList.contains('running')) {
         drawPie(myTime, myBurner, mySpinner, myLoader);
-    } 
+    }
     if (force || opClock.classList.contains('running')) {
         drawPie(opTime, opBurner, opSpinner, opLoader);
     }
 }
 
-function getTime(clock) {
+function readTime(clock) {
     var timer = clock.querySelector('.time');
     return timer ? toSeconds(timer.textContent) : 0;
 }
 
-function drawPie(time, clock, spinner, loader, opTime = null) {
+function drawPie(time, clock, spinner, loader, opTime = null, opLoader = null) {
     if (time < 7 && !isAlertOn) {
         spinner.classList.remove('hide');
         isAlertOn = true;
@@ -133,13 +137,13 @@ function drawPie(time, clock, spinner, loader, opTime = null) {
 function pie(time, loader, reverse) {
     var r = ( time * p / 180 ),
         x = Math.sin( r ) * 125,
-        y = Math.cos( r ) * - 125,
+        y = Math.cos( r ) * -125,
         mid = ( time > 180) ? reverse ? 1 : 0 : reverse ? 0 : 1,
         anim = 'M 0 0 v -125 A 125 125 1 '
             + mid + (reverse ? ' 1 ' : ' 0 ')
             +  x  + ' '
             +  y  + ' z';
-        loader.setAttribute('d', anim);
+    loader.setAttribute('d', anim);
 }
 
 function toSeconds(time) {
