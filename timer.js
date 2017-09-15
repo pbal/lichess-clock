@@ -48,7 +48,7 @@ try {
     script = script.substr(0, script.lastIndexOf(',')).trim();
     var data = JSON.parse(script);
 } catch(e) {
-    console.log('Lichess Clock Chrome Extension works only while playing.');
+    console.log('Lichess Clock data not available on this page for clocks chrome extension.');
 }
 
 if (timeFormatSupport && document.body.classList.contains('playing')) {
@@ -61,38 +61,45 @@ if (timeFormatSupport && document.body.classList.contains('playing')) {
     }
     // dont show when game time is not determined
     if (gameTime !== null) {
+        drawDial(true);
         timeout();
+    }
+}
+function drawDial(force) {
+    var myTime = getTime(myClock);
+    var opTime = getTime(opClock);
+    if (data && data.clock && data.clock.increment) {
+        drawIncrementDial(myTime, opTime);
+    }
+    else {
+        drawSeparateDials(myTime, opTime, force);
     }
 }
 
 function timeout() {
     setTimeout(() => {
-        var myTime = getTime(myClock);
-        var opTime = getTime(opClock);
+        drawDial(false);
 
-        if (data && data.clock && data.clock.increment) {
-            drawIncrementDial(myTime, opTime);
-        }
-        else {
-            drawSeparateDials(myTime, opTime);
-        }
-
-        if (myTime > 0 && opTime > 0 && document.body.classList.contains('playing')) {
+        if (document.body.classList.contains('playing')) {
             timeout();
         } else {
             mySpinner.classList.add('hide');
             opSpinner.classList.add('hide');
         }
-    }, 200);
+    }, 100);
 }
 
 function drawIncrementDial(myTime, opTime) {
     drawPie(myTime, myBurner, mySpinner, myLoader, opTime);
 }
 
-function drawSeparateDials(myTime, opTime) {
-    drawPie(myTime, myBurner, mySpinner, myLoader);
-    drawPie(opTime, opBurner, opSpinner, opLoader);
+function drawSeparateDials(myTime, opTime, force) {
+    if (force || myClock.classList.contains('running')) {
+        drawPie(myTime, myBurner, mySpinner, myLoader);
+    } 
+    if (force || opClock.classList.contains('running')) {
+        drawPie(opTime, opBurner, opSpinner, opLoader);
+    }
 }
 
 function getTime(clock) {
