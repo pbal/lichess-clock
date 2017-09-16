@@ -20,22 +20,24 @@
         console.log('Lichess Clock data not available on this page for clocks chrome extension.');
     }
 
-    if (document.body.classList.contains('playing')) {
-        if (data && data.clock) {
-            gameTime = data.clock.initial;
-        } else {
-            var myGameTime = readTime(myClock);
-            var opGameTime = readTime(opClock);
-            gameTime = myGameTime || hisGameTime;
-        }
+    setTimeout(function() {
+        if (document.body.classList.contains('playing')) {
+            if (data && data.clock) {
+                gameTime = data.clock.initial;
+            } else {
+                var myGameTime = readTime(myClock);
+                var opGameTime = readTime(opClock);
+                gameTime = myGameTime || hisGameTime;
+            }
 
-        // dont show clocks if  game time is not determined
-        if (gameTime !== null) {
-            insertClocks();
-            drawDial(true);
-            tick();
+            // dont show clocks if  game time is not determined
+            if (gameTime !== null) {
+                insertClocks();
+                drawDial(true);
+                tick();
+            }
         }
-    }
+    }, 200);
 
     function insertClocks() {
         var burner = `

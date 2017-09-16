@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "LiChess Pie Clock",
-    "description": "This extension shows the animation for clock on Lichess.org",
+    "description": "This extension animates clock while playing game on Lichess.org",
     "version": "1.0",
     "content_scripts": [
         {
