@@ -2,7 +2,7 @@
     "manifest_version": 2,
     "name": "LiChess Animated Clock",
     "description": "This extension shows an animated clock while playing game on Lichess.org",
-    "version": "1.0",
+    "version": "1.1",
     "content_scripts": [
         {
             "matches": [
