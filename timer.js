@@ -1,8 +1,9 @@
 (function() {
     console.log('chrome extension: lichess clock dials');
 
-    var myClock = document.querySelector('#lichess .clock.clock_bottom'),
-        opClock = document.querySelector('#lichess .clock.clock_top'),
+    var lichess = document.querySelector('#lichess');
+    var myClock = lichess.querySelector('.clock.clock_bottom'),
+        opClock = lichess.querySelector('.clock.clock_top'),
         gameTime = null,
         p = Math.PI,
         isAlertOn = false,
@@ -42,8 +43,8 @@
     function insertClocks() {
         var burner = `
         <svg class='timer rotate'>
-            <path class='loader' transform='translate(140, 140)'/>
-            <path class='oploader' transform='translate(140, 140)'/>
+            <path class='loader' transform='translate(120, 120)'/>
+            <path class='oploader' transform='translate(120, 120)'/>
             <path class='spinner hide'
                     d='M25.251,6.411c-10.318,0-18.683,8.365-18.683,18.683h4.068c0-8.071,6.543-14.615,14.615-14.615V6.461z' >
                 <animateTransform attributeType='xml' attributeName='transform'
@@ -63,8 +64,8 @@
         myBurner.innerHTML = burner;
         opBurner.innerHTML = burner;
 
-        document.body.appendChild(opBurner);
-        document.body.appendChild(myBurner);
+        lichess.appendChild(opBurner);
+        lichess.appendChild(myBurner);
 
         myLoader = myBurner.querySelector('.loader');
         opIncLoader = myBurner.querySelector('.oploader');
@@ -141,10 +142,10 @@
 
     function pie(time, loader, reverse) {
         var r = ( time * p / 180 ),
-            x = Math.sin( r ) * 125,
-            y = Math.cos( r ) * -125,
+            x = Math.sin( r ) * 120,
+            y = Math.cos( r ) * -120,
             mid = ( time > 180) ? reverse ? 1 : 0 : reverse ? 0 : 1,
-            anim = 'M 0 0 v -125 A 125 125 1 '
+            anim = 'M 0 0 v -120 A 120 120 1 '
                 + mid + (reverse ? ' 1 ' : ' 0 ')
                 +  x  + ' '
                 +  y  + ' z';

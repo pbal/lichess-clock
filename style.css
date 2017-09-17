@@ -1,15 +1,14 @@
 #myBurner, #opBurner {
     position: absolute;
-    bottom: 0;
-    height: 280px;
-    width: 280px;
-    margin: 10px;
+    bottom: -240px;
+    height: 240px;
+    width: 240px;
 }
 #opBurner {
-    left: 350px;
+    left: 380px;
 }
 #myBurner {
-    left: 0;
+    left:-50px;
 }
 #myBurner .timer, #opBurner .timer{
     height: 100%;
