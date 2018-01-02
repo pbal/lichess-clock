@@ -35,3 +35,32 @@
 .spinner.hide {
     opacity: 0;
 }
+div.lichess_game div.lichess_ground {
+    padding-left: 0px !important;
+    margin-left: 5px;
+}
+div.incbar {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    margin-left: 15px;
+    width: 20px;
+}
+div.incbar > div:first-child {
+    display: flex;
+    flex-direction: column-reverse;
+}
+div.incbar > div {
+    height: 100%;
+}
+div.incbar div.myBurner {
+    background-color: #759900;
+}
+div.incbar div.opBurner {
+    background-color: #8c0000;
+}
+
+div.incbar .sep {
+    height: 3px;
+    background-color: #929292;
+}

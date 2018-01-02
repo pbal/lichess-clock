@@ -33,14 +33,57 @@
 
             // dont show clocks if  game time is not determined
             if (gameTime !== null) {
-                insertClocks();
-                drawDial(true);
-                tick();
+
+                var myTime = readTime(myClock);
+                var opTime = readTime(opClock);
+
+                chrome.storage.sync.get({
+                    clockFace: 'dials'
+                }, function(items) {
+                    if (items.clockFace === 'dials') {
+                        insertDials();
+                        drawDial(myTime, opTime, true);
+                        tickDial();
+                    }
+                    else if (items.clockFace === 'incbar') {
+                        insertIncBar();
+                        tickBar();
+                    }
+                });
             }
         }
     }, 200);
 
-    function insertClocks() {
+    function insertIncBar() {
+        var lichessGround = lichess.querySelector('.lichess_ground');
+        var parentLG = lichessGround.parentNode;
+
+        var burnerDiv = document.createElement('div');
+        burnerDiv.classList.add('incbar');
+
+        var myBurnerContainer = document.createElement('div');
+
+        var opBurnerContainer = document.createElement('div');
+        // opBurnerContainer.classList.add('opBurnerContainer');
+
+        myBurner = document.createElement('div');
+        myBurner.classList.add('myBurner');
+        opBurner = document.createElement('div');
+        opBurner.classList.add('opBurner');
+
+        myBurnerContainer.appendChild(myBurner);
+        opBurnerContainer.appendChild(opBurner);
+
+        var sep = document.createElement('div');
+        sep.classList.add('sep');
+
+        burnerDiv.appendChild(myBurnerContainer);
+        burnerDiv.appendChild(sep);
+        burnerDiv.appendChild(opBurnerContainer);
+
+        parentLG.insertBefore(burnerDiv, lichessGround);
+    }
+    function insertDials() {
         var burner = `
         <svg class='timer rotate'>
             <path class='loader' transform='translate(120, 120)'/>
@@ -75,28 +118,55 @@
         opSpinner = opBurner.querySelector('.spinner');
     }
 
-    function drawDial(force) {
-        var myTime = readTime(myClock);
-        var opTime = readTime(opClock);
+    function tickDial() {
+        setTimeout(function() {
+            var myTime = readTime(myClock);
+            var opTime = readTime(opClock);
+
+            drawDial(myTime, opTime, true); // turning true - li clock may go to 0 and this might skip update
+
+            if (document.body.classList.contains('playing')) {
+                tickDial();
+            } else {
+                mySpinner.classList.add('hide');
+                opSpinner.classList.add('hide');
+            }
+        }, 200);
+    }
+
+    function tickBar() {
+        setTimeout(function() {
+            var myTime = readTime(myClock);
+            var opTime = readTime(opClock);
+
+            drawIncBar(myTime, opTime);
+
+            if (document.body.classList.contains('playing')) {
+                tickBar();
+            }
+        }, 200);
+    }
+
+    function drawIncBar(myTime, opTime) {
+        if (myTime === opTime) {
+            myBurner.style.height = '0%';
+            opBurner.style.height = '0%';
+        } else if (myTime > opTime) {
+            myBurner.style.height = ((myTime - opTime) / (myTime + opTime) * 100) + '%';
+            opBurner.style.height = '0%';
+        } else {
+            opBurner.style.height = ((opTime - myTime) / (myTime + opTime) * 100) + '%';
+            myBurner.style.height = '0%';
+        }
+    }
+
+    function drawDial(myTime, opTime, force) {
         if (data && data.clock && data.clock.increment) {
             drawIncrementDial(myTime, opTime);
         }
         else {
             drawSeparateDials(myTime, opTime, force);
         }
-    }
-
-    function tick() {
-        setTimeout(function() {
-            drawDial(true); // turning true - li clock may go to 0 and this might skip update
-
-            if (document.body.classList.contains('playing')) {
-                tick();
-            } else {
-                mySpinner.classList.add('hide');
-                opSpinner.classList.add('hide');
-            }
-        }, 200);
     }
 
     function drawIncrementDial(myTime, opTime) {
@@ -110,11 +180,6 @@
         if (force || opClock.classList.contains('running')) {
             drawPie(opTime, opBurner, opSpinner, opLoader);
         }
-    }
-
-    function readTime(clock) {
-        var timer = clock.querySelector('.time');
-        return timer ? toSeconds(timer.textContent) : 0;
     }
 
     function drawPie(time, clock, spinner, loader, opTime = null, opLoader = null) {
@@ -150,6 +215,11 @@
                 +  x  + ' '
                 +  y  + ' z';
         loader.setAttribute('d', anim);
+    }
+
+    function readTime(clock) {
+        var timer = clock.querySelector('.time');
+        return timer ? toSeconds(timer.textContent) : 0;
     }
 
     function toSeconds(time) {
