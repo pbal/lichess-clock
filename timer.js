@@ -1,5 +1,5 @@
 (function() {
-    console.log('chrome extension: lichess clock dials');
+    console.log('clock extension: lichess animated clocks');
 
     var lichess = document.querySelector('#lichess');
     var myClock = lichess.querySelector('.clock.clock_bottom'),
@@ -13,12 +13,11 @@
     // read game time from lichess data obj
     try {
         var script = document.querySelectorAll('script')[2].textContent;
-        script = script.substr(script.indexOf('data: ') + 6);
-        script = script.substr(0, script.indexOf('i18n:'));
+        script = script.substr(script.indexOf('data: ') + 6, script.indexOf('i18n:'));
         script = script.substr(0, script.lastIndexOf(',')).trim();
         var data = JSON.parse(script);
     } catch(e) {
-        console.log('Lichess Clock data not available on this page for clocks chrome extension.');
+        console.log('clock extension: Lichess clock data not available on this page.');
     }
 
     setTimeout(function() {
@@ -31,7 +30,7 @@
                 gameTime = myGameTime || hisGameTime;
             }
 
-            // dont show clocks if  game time is not determined
+            // dont show clocks if game time is not determined
             if (gameTime !== null) {
 
                 var myTime = readTime(myClock);
@@ -42,7 +41,7 @@
                 }, function(items) {
                     if (items.clockFace === 'dials') {
                         insertDials();
-                        drawDial(myTime, opTime, true);
+                        drawDial(myTime, opTime); // init 360 dials
                         tickDial();
                     }
                     else if (items.clockFace === 'incbar') {
@@ -50,25 +49,25 @@
                         tickBar();
                     }
                 });
+            } else {
+                console.warn('clock extension: Not able to determine game time.');
             }
         }
     }, 200);
 
     function insertIncBar() {
-        var lichessGround = lichess.querySelector('.lichess_ground');
-        var parentLG = lichessGround.parentNode;
+        var liGround = lichess.querySelector('.lichess_ground');
+        var liGroundParent = liGround.parentNode;
 
         var burnerDiv = document.createElement('div');
         burnerDiv.classList.add('incbar');
 
         var myBurnerContainer = document.createElement('div');
-
         var opBurnerContainer = document.createElement('div');
-        // opBurnerContainer.classList.add('opBurnerContainer');
 
         myBurner = document.createElement('div');
-        myBurner.classList.add('myBurner');
         opBurner = document.createElement('div');
+        myBurner.classList.add('myBurner');
         opBurner.classList.add('opBurner');
 
         myBurnerContainer.appendChild(myBurner);
@@ -81,8 +80,9 @@
         burnerDiv.appendChild(sep);
         burnerDiv.appendChild(opBurnerContainer);
 
-        parentLG.insertBefore(burnerDiv, lichessGround);
+        liGroundParent.insertBefore(burnerDiv, liGround);
     }
+
     function insertDials() {
         var burner = `
         <svg class='timer rotate'>
@@ -98,12 +98,11 @@
             </path>
         </svg>
         `;
+
         myBurner = document.createElement('div');
         opBurner = document.createElement('div');
-
         myBurner.setAttribute('id', 'myBurner');
         opBurner.setAttribute('id', 'opBurner');
-
         myBurner.innerHTML = burner;
         opBurner.innerHTML = burner;
 
@@ -123,7 +122,7 @@
             var myTime = readTime(myClock);
             var opTime = readTime(opClock);
 
-            drawDial(myTime, opTime, true); // turning true - li clock may go to 0 and this might skip update
+            drawDial(myTime, opTime);
 
             if (document.body.classList.contains('playing')) {
                 tickDial();
@@ -160,12 +159,12 @@
         }
     }
 
-    function drawDial(myTime, opTime, force) {
+    function drawDial(myTime, opTime) {
         if (data && data.clock && data.clock.increment) {
             drawIncrementDial(myTime, opTime);
         }
         else {
-            drawSeparateDials(myTime, opTime, force);
+            drawSeparateDials(myTime, opTime);
         }
     }
 
@@ -173,13 +172,13 @@
         drawPie(myTime, myBurner, mySpinner, myLoader, opTime, opIncLoader);
     }
 
-    function drawSeparateDials(myTime, opTime, force) {
-        if (force || myClock.classList.contains('running')) {
-            drawPie(myTime, myBurner, mySpinner, myLoader);
-        }
-        if (force || opClock.classList.contains('running')) {
-            drawPie(opTime, opBurner, opSpinner, opLoader);
-        }
+    function drawSeparateDials(myTime, opTime) {
+        // Avoid skipping update incase clock countsdown to 0 and game is not playing
+        // in this case li clock may go to 0 and dial could still indicate some time.
+        // if (myClock.classList.contains('running'))
+        drawPie(myTime, myBurner, mySpinner, myLoader);
+        // if (opClock.classList.contains('running'))
+        drawPie(opTime, opBurner, opSpinner, opLoader);
     }
 
     function drawPie(time, clock, spinner, loader, opTime = null, opLoader = null) {
