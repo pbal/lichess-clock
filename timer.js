@@ -151,10 +151,10 @@
             myBurner.style.height = '0%';
             opBurner.style.height = '0%';
         } else if (myTime > opTime) {
-            myBurner.style.height = ((myTime - opTime) / (myTime + opTime) * 100) + '%';
+            myBurner.style.height = ((myTime - opTime) / (myTime) * 100) + '%';
             opBurner.style.height = '0%';
         } else {
-            opBurner.style.height = ((opTime - myTime) / (myTime + opTime) * 100) + '%';
+            opBurner.style.height = ((opTime - myTime) / (opTime) * 100) + '%';
             myBurner.style.height = '0%';
         }
     }
