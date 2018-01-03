@@ -24,8 +24,8 @@ NIY: Vertically stacked lichess progress bars. Time counts down to middle.
 
 ## Mode 4 - Parallel Lichess progress bars
 
-NIY: 2 Vertical bars side by side - similar to lichess timer
+NIY: 2 Vertical bars side by side - similar to lichess progress bar
 
-## Mode 5 - Reflective seesaw
+## Mode 5 - Seesaw
 
-NIY: Indicator grows for player with more time. Indicator shrinks for player on losing time.
+Similar to incremental dial mode but on bar
