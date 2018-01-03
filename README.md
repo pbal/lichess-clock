@@ -13,19 +13,19 @@ For a game with increment you will see a single dial split for both players. Eac
 
 Supports if browser height is greater than 900 px.
 
-## Mode 2 - Incremental Bar
+## Mode 2 - Seesaw
 Concept https://lichess.org/forum/lichess-feedback/game-improvement-new-time-bar
 
-## Mode 3 - Hourglass
-WIP
+Indicator grows for player with more time. Nothing for opponent.
 
-## Mode 4 - Decreasing Bar
-WIP
+## Mode 3 - Decreasing Bars
 
-## Mode 5 - Water Jug
-WIP
+NIY: Vertically stacked lichess progress bars. Time counts down to middle.
 
-## Mode 6 - Tug of war
-WIP
+## Mode 4 - Parallel Lichess progress bars
 
+NIY: 2 Vertical bars side by side - similar to lichess timer
 
+## Mode 5 - Reflective seesaw
+
+NIY: Indicator grows for player with more time. Indicator shrinks for player on losing time.
