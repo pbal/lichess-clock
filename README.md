@@ -13,7 +13,7 @@ For a game with increment you will see a single dial split for both players. Eac
 
 Supports if browser height is greater than 900 px.
 
-## Mode 2 - Seesaw
+## Mode 2 - Half Seesaw Bar
 Concept https://lichess.org/forum/lichess-feedback/game-improvement-new-time-bar
 
 Indicator grows for player with more time. Nothing for opponent.
