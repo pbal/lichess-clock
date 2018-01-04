@@ -1,63 +1,56 @@
-(function() {
+(function () {
     console.log('clock extension: lichess animated clocks');
 
     var lichess = document.querySelector('#lichess');
     var myClock = lichess.querySelector('.clock.clock_bottom'),
         opClock = lichess.querySelector('.clock.clock_top'),
-        gameTime = null,
         p = Math.PI,
-        isAlertOn = false,
         myBurner, myLoader, mySpinner, opIncLoader,
         opBurner, opLoader, opSpinner;
 
     // read game time from lichess data obj
     try {
         var script = document.querySelectorAll('script')[2].textContent;
-        script = script.substr(script.indexOf('data: ') + 6, script.indexOf('i18n:'));
+        script = script.substr(script.indexOf('data: ') + 6);
+        script = script.substr(0, script.indexOf('i18n:'));
         script = script.substr(0, script.lastIndexOf(',')).trim();
         var data = JSON.parse(script);
-    } catch(e) {
+    } catch (e) {
         console.log('clock extension: Lichess clock data not available on this page.');
     }
 
-    setTimeout(function() {
+    setTimeout(function () {
         if (document.body.classList.contains('playing')) {
-            if (data && data.clock) {
-                gameTime = data.clock.initial;
-            } else {
-                var myGameTime = readTime(myClock);
-                var opGameTime = readTime(opClock);
-                gameTime = myGameTime || hisGameTime;
-            }
+            var myTime = readTime(myClock);
+            var opTime = readTime(opClock);
 
-            // dont show clocks if game time is not determined
-            if (gameTime !== null) {
-
-                var myTime = readTime(myClock);
-                var opTime = readTime(opClock);
-
-                chrome.storage.sync.get({
-                    clockFace: 'dials'
-                }, function(items) {
-                    if (items.clockFace === 'dials') {
+            chrome.storage.sync.get({
+                clockFace: 'dials'
+            }, function (items) {
+                switch (items.clockFace) {
+                    case 'dials':
                         insertDials();
-                        drawDial(myTime, opTime); // init 360 dials
                         tickDial();
-                    }
-                    else if (items.clockFace === 'incbar') {
-                        insertIncBar();
-                        tickBar();
-                    }
-                });
-            } else {
-                console.warn('clock extension: Not able to determine game time.');
-            }
+                        break;
+                    case 'incbar':
+                        insertBar(true);
+                        tickBar(true);
+                        break;
+                    case 'decbar':
+                        insertBar();
+                        tickBar(false);
+                        break;
+                    default:
+                        console.warn('clock face not supported');
+                }
+            });
         }
-    }, 200);
+    }, 100);
 
-    function insertIncBar() {
+    function insertBar(inc) {
         var liGround = lichess.querySelector('.lichess_ground');
         var liGroundParent = liGround.parentNode;
+        liGround.classList.add('incont');
 
         var burnerDiv = document.createElement('div');
         burnerDiv.classList.add('incbar');
@@ -76,10 +69,16 @@
         var sep = document.createElement('div');
         sep.classList.add('sep');
 
-        burnerDiv.appendChild(myBurnerContainer);
-        burnerDiv.appendChild(sep);
-        burnerDiv.appendChild(opBurnerContainer);
-
+        if (inc) {
+            burnerDiv.appendChild(myBurnerContainer);
+            burnerDiv.appendChild(sep);
+            burnerDiv.appendChild(opBurnerContainer);
+        }
+        else{
+            burnerDiv.appendChild(opBurnerContainer);
+            burnerDiv.appendChild(sep);
+            burnerDiv.appendChild(myBurnerContainer);
+        }
         liGroundParent.insertBefore(burnerDiv, liGround);
     }
 
@@ -118,11 +117,21 @@
     }
 
     function tickDial() {
-        setTimeout(function() {
+        setTimeout(function () {
             var myTime = readTime(myClock);
             var opTime = readTime(opClock);
 
-            drawDial(myTime, opTime);
+            var myEmerg = myClock.classList.contains('emerg');
+            var opEmerg = opClock.classList.contains('emerg');
+
+            // incremental
+            if (data && data.clock && data.clock.increment) {
+                drawPie(myTime, myBurner, mySpinner, myLoader, myEmerg, opTime);
+            } else {
+                // 2 dials
+                drawPie(myTime, myBurner, mySpinner, myLoader, myEmerg);
+                drawPie(opTime, opBurner, opSpinner, opLoader, opEmerg);
+            }
 
             if (document.body.classList.contains('playing')) {
                 tickDial();
@@ -130,20 +139,23 @@
                 mySpinner.classList.add('hide');
                 opSpinner.classList.add('hide');
             }
-        }, 200);
+        }, 100);
     }
 
-    function tickBar() {
-        setTimeout(function() {
+    function tickBar(inc) {
+        setTimeout(function () {
             var myTime = readTime(myClock);
             var opTime = readTime(opClock);
 
-            drawIncBar(myTime, opTime);
+            if (inc)
+                drawIncBar(myTime, opTime);
+            else
+                drawDecBar(myTime, opTime);
 
             if (document.body.classList.contains('playing')) {
-                tickBar();
+                tickBar(inc);
             }
-        }, 200);
+        }, 100);
     }
 
     function drawIncBar(myTime, opTime) {
@@ -159,44 +171,25 @@
         }
     }
 
-    function drawDial(myTime, opTime) {
-        if (data && data.clock && data.clock.increment) {
-            drawIncrementDial(myTime, opTime);
-        }
-        else {
-            drawSeparateDials(myTime, opTime);
-        }
+    function drawDecBar(myTime, opTime) {
+        myBurner.style.height = myTime * 100 + '%';
+        opBurner.style.height = opTime * 100 + '%';
     }
 
-    function drawIncrementDial(myTime, opTime) {
-        drawPie(myTime, myBurner, mySpinner, myLoader, opTime, opIncLoader);
-    }
-
-    function drawSeparateDials(myTime, opTime) {
-        // Avoid skipping update incase clock countsdown to 0 and game is not playing
-        // in this case li clock may go to 0 and dial could still indicate some time.
-        // if (myClock.classList.contains('running'))
-        drawPie(myTime, myBurner, mySpinner, myLoader);
-        // if (opClock.classList.contains('running'))
-        drawPie(opTime, opBurner, opSpinner, opLoader);
-    }
-
-    function drawPie(time, clock, spinner, loader, opTime = null, opLoader = null) {
-        if (time < 7 && !isAlertOn) {
+    function drawPie(time, clock, spinner, loader, emerg, opTime = null) {
+        if (emerg) {
             spinner.classList.remove('hide');
-            isAlertOn = true;
-        } else if (time >= 7 && opTime !== null && isAlertOn) {
+        } else {
             spinner.classList.add('hide');
-            isAlertOn = false;
         }
 
         if (opTime === null) {
             // 2 dials
-            time = 360 - time * 360 / gameTime || .01;
+            time = 360 - time * 360 || .01;
             pie(time, loader, false);
         } else {
             // incremental 1 dial
-            var m = (360 - (time / (time + opTime)) * 360) || .01;
+            var m = 360 - (time / (time + opTime)) * 360 || .01;
             var h = ((opTime / (time + opTime)) * 360) || .01;
 
             pie(m, loader);
@@ -205,29 +198,19 @@
     }
 
     function pie(time, loader, reverse) {
-        var r = ( time * p / 180 ),
-            x = Math.sin( r ) * 120,
-            y = Math.cos( r ) * -120,
-            mid = ( time > 180) ? reverse ? 1 : 0 : reverse ? 0 : 1,
+        var r = (time * p / 180),
+            x = Math.sin(r) * 120,
+            y = Math.cos(r) * -120,
+            mid = (time > 180) ? reverse ? 1 : 0 : reverse ? 0 : 1,
             anim = 'M 0 0 v -120 A 120 120 1 '
                 + mid + (reverse ? ' 1 ' : ' 0 ')
-                +  x  + ' '
-                +  y  + ' z';
+                + x + ' '
+                + y + ' z';
         loader.setAttribute('d', anim);
     }
 
     function readTime(clock) {
-        var timer = clock.querySelector('.time');
-        return timer ? toSeconds(timer.textContent) : 0;
-    }
-
-    function toSeconds(time) {
-        var parts = time.trim().split(':');
-        var m = parseInt(parts[0]);
-        var secParts = parts[1].split('.');
-        var s = parseInt(secParts[0]);
-        var h = secParts.length > 1 ? parseInt(secParts[1].substr(0, 1)) : 0;
-        var val = m * 60 + s + h / 10;
-        return val;
+        var timer = clock.querySelector('.bar');
+        return parseFloat(timer.style.transform.replace('scale(', '').replace(', 1)', ''));
     }
 })();
