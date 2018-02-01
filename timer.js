@@ -2,11 +2,10 @@
     console.log('clock extension: lichess animated clocks');
 
     var lichess = document.querySelector('#lichess');
-    var myClock = lichess.querySelector('.clock.clock_bottom'),
-        opClock = lichess.querySelector('.clock.clock_top'),
-        p = Math.PI,
+    var p = Math.PI,
         myBurner, myLoader, mySpinner, opIncLoader,
-        opBurner, opLoader, opSpinner;
+        opBurner, opLoader, opSpinner,
+        myClock, opClock;
 
     // read game time from lichess data obj
     try {
@@ -20,6 +19,8 @@
     }
 
     setTimeout(function () {
+        myClock = lichess.querySelector('.clock.clock_bottom'),
+        opClock = lichess.querySelector('.clock.clock_top');
         if (document.body.classList.contains('playing')) {
             var myTime = readTime(myClock);
             var opTime = readTime(opClock);
@@ -34,26 +35,35 @@
                         break;
                     case 'incbar':
                         insertBar(true);
-                        tickBar(true);
+                        tickBar(1);
                         break;
                     case 'decbar':
                         insertBar();
-                        tickBar(false);
+                        tickBar(2);
+                        break;
+                    case 'para':
+                        insertBar(false, false, 'parbar');
+                        tickBar(2);
+                        break;
+                    case 'fsee':
+                        insertBar();
+                        tickBar(3);
                         break;
                     default:
                         console.warn('clock face not supported');
                 }
             });
         }
-    }, 100);
+    }, 300);
 
-    function insertBar(inc) {
+    function insertBar(inc, separator = true, style = '') {
         var liGround = lichess.querySelector('.lichess_ground');
         var liGroundParent = liGround.parentNode;
         liGround.classList.add('incont');
 
         var burnerDiv = document.createElement('div');
         burnerDiv.classList.add('incbar');
+        style ? burnerDiv.classList.add(style) : 0;
 
         var myBurnerContainer = document.createElement('div');
         var opBurnerContainer = document.createElement('div');
@@ -71,12 +81,12 @@
 
         if (inc) {
             burnerDiv.appendChild(myBurnerContainer);
-            burnerDiv.appendChild(sep);
+            separator ? burnerDiv.appendChild(sep) : 0;
             burnerDiv.appendChild(opBurnerContainer);
         }
-        else{
+        else {
             burnerDiv.appendChild(opBurnerContainer);
-            burnerDiv.appendChild(sep);
+            separator ? burnerDiv.appendChild(sep) : 0;
             burnerDiv.appendChild(myBurnerContainer);
         }
         liGroundParent.insertBefore(burnerDiv, liGround);
@@ -142,18 +152,24 @@
         }, 100);
     }
 
-    function tickBar(inc) {
+    function tickBar(mode) {
         setTimeout(function () {
             var myTime = readTime(myClock);
             var opTime = readTime(opClock);
 
-            if (inc)
-                drawIncBar(myTime, opTime);
-            else
-                drawDecBar(myTime, opTime);
-
+            switch (mode) {
+                case 1:
+                    drawIncBar(myTime, opTime);
+                    break;
+                case 2:
+                    drawDecBar(myTime, opTime);
+                    break;
+                case 3:
+                    drawFullSeeSaw(myTime, opTime);
+                    break;
+            }
             if (document.body.classList.contains('playing')) {
-                tickBar(inc);
+                tickBar(mode);
             }
         }, 100);
     }
@@ -174,6 +190,11 @@
     function drawDecBar(myTime, opTime) {
         myBurner.style.height = myTime * 100 + '%';
         opBurner.style.height = opTime * 100 + '%';
+    }
+
+    function drawFullSeeSaw(myTime, opTime) {
+        myBurner.style.height = (((myTime - opTime) / myTime))  * 100 + '%';
+        opBurner.style.height = (100 - (((myTime - opTime) / myTime))  * 100) + '%';
     }
 
     function drawPie(time, clock, spinner, loader, emerg, opTime = null) {

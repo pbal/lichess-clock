@@ -50,8 +50,16 @@ div.incbar > div:first-child {
     display: flex;
     flex-direction: column-reverse;
 }
+
+div.incbar.parbar {
+    flex-flow: row;
+}
+
 div.incbar > div {
     height: 100%;
+}
+div.incbar.parbar > div {
+    width: 10px;
 }
 div.incbar div.myBurner {
     background-color: #759900;
