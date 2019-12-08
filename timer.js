@@ -1,12 +1,13 @@
 (function () {
     console.log('clock extension: lichess animated clocks');
 
-    var lichess = document.querySelector('#lichess');
+    var lichess = document.querySelector('#main-wrap');
     var p = Math.PI,
         myBurner, myLoader, mySpinner, opIncLoader,
         opBurner, opLoader, opSpinner,
         myClock, opClock;
 
+    var myGlobalTime, opGlobalTime;
     // read game time from lichess data obj
     try {
         var script = document.querySelectorAll('script')[2].textContent;
@@ -19,11 +20,11 @@
     }
 
     setTimeout(function () {
-        myClock = lichess.querySelector('.clock.clock_bottom'),
-        opClock = lichess.querySelector('.clock.clock_top');
+        myClock = lichess.querySelector('.rclock.rclock-bottom'),
+            opClock = lichess.querySelector('.rclock.rclock-top');
         if (document.body.classList.contains('playing')) {
-            var myTime = readTime(myClock);
-            var opTime = readTime(opClock);
+            myGlobalTime = readTime(myClock);
+            opGlobalTime = readTime(opClock);
 
             chrome.storage.sync.get({
                 clockFace: 'dials'
@@ -54,7 +55,7 @@
                 }
             });
         }
-    }, 300);
+    }, 500);
 
     function insertBar(inc, separator = true, style = '') {
         var liGround = lichess.querySelector('.lichess_ground');
@@ -149,7 +150,7 @@
                 mySpinner.classList.add('hide');
                 opSpinner.classList.add('hide');
             }
-        }, 100);
+        }, 500);
     }
 
     function tickBar(mode) {
@@ -171,7 +172,7 @@
             if (document.body.classList.contains('playing')) {
                 tickBar(mode);
             }
-        }, 100);
+        }, 500);
     }
 
     function drawIncBar(myTime, opTime) {
@@ -193,8 +194,8 @@
     }
 
     function drawFullSeeSaw(myTime, opTime) {
-        myBurner.style.height = (((myTime - opTime) / myTime))  * 100 + '%';
-        opBurner.style.height = (100 - (((myTime - opTime) / myTime))  * 100) + '%';
+        myBurner.style.height = (((myTime - opTime) / myTime)) * 100 + '%';
+        opBurner.style.height = (100 - (((myTime - opTime) / myTime)) * 100) + '%';
     }
 
     function drawPie(time, clock, spinner, loader, emerg, opTime = null) {
@@ -206,7 +207,9 @@
 
         if (opTime === null) {
             // 2 dials
-            time = 360 - time * 360 || .01;
+
+            var ca = myGlobalTime - time;
+            time = 360 - (time / myGlobalTime) * 360 || .01;
             pie(time, loader, false);
         } else {
             // incremental 1 dial
@@ -231,7 +234,11 @@
     }
 
     function readTime(clock) {
-        var timer = clock.querySelector('.bar');
-        return parseFloat(timer.style.transform.replace('scale(', '').replace(', 1)', ''));
+        var timer = clock.querySelector('.time');
+        if (!timer) return;
+        var a = timer.textContent.split(':');
+        var seconds = (+a[0]) * 60 + (+a[1]);
+
+        return seconds;
     }
 })();
