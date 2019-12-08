@@ -18,10 +18,7 @@
                 "https://lichess.org/*"
             ],
             "css": [
-                "./style.css"
-            ],
-            "js": [
-                "./timer.js"
+                "./yellow.css"
             ]
         }
     ]
