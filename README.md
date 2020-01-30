@@ -18,14 +18,3 @@ Concept https://lichess.org/forum/lichess-feedback/game-improvement-new-time-bar
 
 Indicator grows for player with more time. Nothing for opponent.
 
-## Mode 3 - Decreasing Bars
-
-NIY: Vertically stacked lichess progress bars. Time counts down to middle.
-
-## Mode 4 - Parallel Lichess progress bars
-
-NIY: 2 Vertical bars side by side - similar to lichess progress bar
-
-## Mode 5 - Seesaw
-
-Similar to incremental dial mode but on bar
